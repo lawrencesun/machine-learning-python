@@ -1,0 +1,6 @@
+* Virtual Environment
+
+virtualenv MLENV --python=python2.7
+cd MLENV
+source ./bin/activate
+deactivate
