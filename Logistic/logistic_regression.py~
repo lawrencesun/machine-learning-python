@@ -1,0 +1,146 @@
+#coding=utf-8
+# machine learning practice
+# Yuliang Sun, 2016
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn import datasets, linear_model
+import pandas as pd
+import re
+
+####################
+## Sigmoid
+def sigmoid(z):
+	return 1.0 / (1 + np.exp(-z))
+##
+####################
+
+######################
+## Cost Function
+def cost(X, y, theta):
+	h = sigmoid(X * theta)
+	J = (- y * np.log(h) - (1 - y ) * np.log(1 - h)) / m
+	return J
+##
+
+#####################
+## Graditent Descent
+def gradient_descent(alpha, theta, iters, X, y):
+	i = 0
+	J_list = []
+	while i < iters:
+		error = sigmoid(X * theta) - y
+		theta = theta - alpha / X.T * error
+		i += 1
+		#J = cost(X, y, theta)
+		#J_list.append(J[0,0])	
+	return (theta, J_list)
+##
+#####################
+
+####################
+## Feature Scaling
+def feature_scaling(f):
+	f_mean = np.mean(f)
+	f_std = np.std(f)
+	f_scaling = (f - f_mean)/f_std
+	return (f_mean, f_std, f_scaling)
+##
+####################
+
+
+####################
+## Load Data
+## male: gender = 1; female: gender = 2; 
+
+datafile = pd.read_excel("psydata.xlsx")
+
+male_data = datafile.loc[datafile['gender'] == 1].loc[0:1999,['50m','jump']]
+female_data = datafile.loc[datafile['gender'] == 2].loc[0:1999,['50m','jump']]
+
+male_data = np.mat(male_data.values)
+
+male_50m = male_data[:,0]
+male_jump = male_data[:,1]
+
+female_data = np.mat(female_data.values)
+female_50m = female_data[:,0]
+female_jump = female_data[:,1]
+
+#########################
+## Show Training Data
+
+plt.title('Training Data', size=14)
+plt.xlabel('50m', size=14)
+plt.ylabel('jump', size=14)
+plt.scatter(female_50m, female_jump, color='r')
+plt.scatter(male_50m, male_jump, color='b')
+plt.show()
+
+#########################
+## Preprocess Data
+features = datafile.loc[0:9,['50m','jump']]
+target = datafile.loc[0:9,['gender']]
+
+# number of features
+n = 2
+y = np.mat(target.values)
+# number of training
+m = y.size
+
+# output 0 if male, 1 if female
+for i in range(0, m):
+	if y[i] == 1:		
+		y[i] = 0
+	else: 
+		y[i] = 1
+
+# add ones to X
+(x_mean, x_std, x_scaling) = feature_scaling(features)
+x_scaling = np.mat(x_scaling)
+X = np.c_[np.ones(m),x_scaling]
+
+#########################
+## Get theta through Gradient Descent
+
+# set alpha and iteration numbers
+alpha = 0.01
+theta = np.zeros([(n + 1), 1])
+iters = 5000
+
+(theta, J) = gradient_descent(alpha, theta, iters, X, y)
+print 'theta through gradient descent: \n%r\n' %theta
+#print 'Cost: %r\n' %J[-1]
+
+#########################
+## Prediction
+
+features_test = datafile.loc[2000:2500,['50m','jump']]
+target_test = datafile.loc[2000:2500,['gender']]
+
+y_test = np.mat(target_test.values)
+m = y_test.size
+
+# output 0 if male, 1 if female
+for i in range(0, m):
+	if y_test[i] == 1:		
+		y_test[i] = 0
+	else: 
+		y_test[i] = 1
+
+# add ones to X
+(x_mean, x_std, x_scaling) = feature_scaling(features_test)
+x_scaling_test = np.mat(x_scaling)
+X_test = np.c_[np.ones(m),np.mat(x_scaling_test)]
+
+# prediction
+y_prediction = sigmoid(X_test * theta) > 0.5
+
+count = 0.0
+for i in range(0, m):
+	if y_prediction[i] == bool(y_test[i]):
+		count += 1
+accuracy = count / m
+
+print 'The test accuracy: \n%r\n' %accuracy
+
+

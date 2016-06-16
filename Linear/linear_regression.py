@@ -1,6 +1,6 @@
 #coding=utf-8
 # machine learning practice
-# Yuliang Sun, 2015
+# Yuliang Sun, 2016
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets, linear_model
@@ -55,12 +55,12 @@ def gradient_descent(alpha, theta, iters, X, y):
 
 datafile = pd.read_excel("psydata.xlsx")
 
-features = datafile.loc[datafile['gender'] == 1].loc[0:500,['height','weight','vcapacity','50m','jump']]
-target = datafile.loc[datafile['gender'] == 1].loc[0:500,['longdistance-m']]
+features = datafile.loc[datafile['gender'] == 1].loc[0:1999,['vcapacity','50m','jump']]
+target = datafile.loc[datafile['gender'] == 1].loc[0:1999,['longdistance-m']]
 #target = datafile.loc[datafile['gender'] == 2].loc[0:500,['longdistance-f']]
 
 # number of features
-n = 5
+n = 3
 y = np.mat(target.values)
 # number of training
 m = y.size
@@ -109,11 +109,11 @@ plt.show()
 
 #####################
 ## Test
-x_test = datafile.loc[datafile['gender'] == 1].loc[1000:1500,['height','weight','vcapacity','50m','jump']]
+x_test = datafile.loc[datafile['gender'] == 1].loc[2000:2500,['vcapacity','50m','jump']]
 print 'Test Features: \n%r\n' %x_test
 
 # number of test 
-y_test = datafile.loc[datafile['gender'] == 1].loc[1000:1500,['longdistance-m']]
+y_test = datafile.loc[datafile['gender'] == 1].loc[2000:2500,['longdistance-m']]
 y_test = np.mat(y_test)
 #m = x_test.shape[0]
 m = y_test.size
